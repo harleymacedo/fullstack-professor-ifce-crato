@@ -1,24 +1,37 @@
+//Imports gerais
 const laboratorioRouter = require('express').Router();
+const mongoose = require('mongoose')
+const laboratorio = require('../models/laboratorioModel')
 
-laboratorioRouter.get('/laboratio/todos', (req, res) => {
+//Rota para obter todos os laboratórios
+laboratorioRouter.get('/laboratorio/todos', async (req, res) => {
     try {
-        res.json({laboratorios: []})
+        await mongoose.connect(process.env.DB_STR_CON)
+        const laboratoriosBuscados = await laboratorio.find()
+        res.json({laboratorios: laboratoriosBuscados})
     } catch (error) {
         res.json({message: 'Erro durante a consulta'})
     }
 })
 
-laboratorioRouter.get('/laboratorio/porId/:id', (req, res) => {
+//Rota para obter um laboratório pelo id
+laboratorioRouter.get('/laboratorio/porId/:id', async (req, res) => {
     try {
-        res.json({laboratorio: {}})
+        await mongoose.connect(process.env.DB_STR_CON)
+        const laboratorioBuscado = await laboratorio.findById(req.params.id)
+        res.json({laboratorio: laboratorioBuscado})
     } catch (error) {
         res.json({message: 'Erro durante a consulta'})
     }
 })
 
-laboratorioRouter.get('/laboratorio/porNome/:nome', (req, res) => {
+//Rota para obter laboratórios por nome
+laboratorioRouter.get('/laboratorio/porNome/:nome', async (req, res) => {
     try {
-        res.json({laboratorios: []})
+        await mongoose.connect(process.env.DB_STR_CON)
+        const filtro = req.params.nome
+        const laboratoriosBuscados = await laboratorio.find({"nome": {$regex: filtro}})
+        res.json({laboratorios: laboratoriosBuscados})
     } catch (error) {
         res.json({message: 'Erro durante a consulta'})
     }
