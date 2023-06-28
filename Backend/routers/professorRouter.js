@@ -1,24 +1,36 @@
-const professorRouter = require('express').Router();
+const professorRouter = require('express').Router()
+const mongoose = require('mongoose')
+const professor = require('../models/professorModel')
 
-professorRouter.get('/professor/todos', (req, res) => {
+//Obter todos os professores
+professorRouter.get('/professor/todos', async (req, res) => {
     try {
-        res.json({professores: []})
+        await mongoose.connect(process.env.DB_STR_CON)
+        const professoresBuscados = professor.find()
+        res.json({professores: professoresBuscados})
     } catch (error) {
         res.json({message: 'Erro durante a consulta'})
     }
 })
 
-professorRouter.get('/professor/porId/:id', (req, res) => {
+//Obter professor por ID
+professorRouter.get('/professor/porId/:id', async (req, res) => {
     try {
-        res.json({professor: {}})
+        await mongoose.connect(process.env.DB_STR_CON)
+        const professorBuscado = await professor.findById(req.params.id)
+        res.json({professor: professorBuscado})
     } catch (error) {
         res.json({message: 'Erro durante a consulta'})
     }
 })
 
-professorRouter.get('/professor/porNome/:nome', (req, res) => {
+//Obter professor por Nome
+professorRouter.get('/professor/porNome/:nome', async (req, res) => {
     try {
-        res.json({professores: []})
+        await mongoose.connect(process.env.DB_STR_CON)
+        const filtro = req.params.nome
+        const professoresBuscados = await professor.find({nome: {$regex: filtro}})
+        res.json({professores: professoresBuscados})
     } catch (error) {
         res.json({message: 'Erro durante a consulta'})
     }
